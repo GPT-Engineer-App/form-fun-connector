@@ -26,6 +26,10 @@ const SellYourBike = () => {
         VITE_EMAILJS_PUBLIC_KEY: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       });
 
+      if (!import.meta.env.VITE_EMAILJS_SERVICE_ID || !import.meta.env.VITE_EMAILJS_TEMPLATE_ID || !import.meta.env.VITE_EMAILJS_PUBLIC_KEY) {
+        throw new Error("Missing EmailJS configuration. Please check your environment variables.");
+      }
+
       const templateParams = {
         to_email: 'a0jankowski@gmail.com',
         from_name: `${data.firstName} ${data.lastName}`,
@@ -58,8 +62,9 @@ const SellYourBike = () => {
       toast.success("Form submitted successfully!");
     } catch (error) {
       console.error("EmailJS error:", error);
-      setError(`Failed to submit form: ${error.message}`);
-      toast.error(`Failed to submit form: ${error.message}`);
+      const errorMessage = error.message || 'An unknown error occurred';
+      setError(`Failed to submit form: ${errorMessage}`);
+      toast.error(`Failed to submit form: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
