@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,11 +16,30 @@ const SellYourBike = () => {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
+      const templateParams = {
+        to_email: 'a0jankowski@gmail.com',
+        from_name: `${data.firstName} ${data.lastName}`,
+        message: `
+          Name: ${data.firstName} ${data.lastName}
+          Email: ${data.email}
+          Phone: ${data.phone}
+          Postcode: ${data.postcode}
+          Part Exchange: ${data.partExchange}
+          Manufacturer: ${data.manufacturer}
+          Model: ${data.model}
+          Frame Size: ${data.frameSize}
+          Issues: ${data.issues}
+          How they heard about us: ${data.heardAbout}
+          Other: ${data.other}
+          Marketing consent: ${data.marketing ? 'Yes' : 'No'}
+        `
+      };
+
       await emailjs.send(
         'YOUR_SERVICE_ID',
         'YOUR_TEMPLATE_ID',
-        data,
-        'YOUR_USER_ID'
+        templateParams,
+        'YOUR_PUBLIC_KEY'
       );
       toast.success("Form submitted successfully!");
     } catch (error) {
@@ -75,7 +94,7 @@ const SellYourBike = () => {
             </div>
             <div>
               <Label>Are you looking to part exchange? *</Label>
-              <RadioGroup defaultValue="no">
+              <RadioGroup defaultValue="no" onValueChange={(value) => register("partExchange")(value)}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="yes" />
                   <Label htmlFor="yes">Yes</Label>
