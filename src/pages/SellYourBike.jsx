@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import emailjs from '@emailjs/browser';
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -13,8 +14,11 @@ const SellYourBike = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [error, setError] = useState(null);
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+    setError(null);
     try {
       const templateParams = {
         to_email: 'a0jankowski@gmail.com',
@@ -36,13 +40,15 @@ const SellYourBike = () => {
       };
 
       await emailjs.send(
-        'YOUR_SERVICE_ID',
-        'YOUR_TEMPLATE_ID',
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         templateParams,
-        'YOUR_PUBLIC_KEY'
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       );
       toast.success("Form submitted successfully!");
     } catch (error) {
+      console.error("EmailJS error:", error);
+      setError("Failed to submit form. Please try again or contact support.");
       toast.error("Failed to submit form. Please try again.");
     }
     setIsSubmitting(false);
@@ -164,6 +170,11 @@ const SellYourBike = () => {
               {isSubmitting ? 'Submitting...' : 'SUBMIT'}
             </Button>
           </form>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </div>
       </div>
     </div>
